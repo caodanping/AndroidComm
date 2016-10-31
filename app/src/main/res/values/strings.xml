@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">AndroidComm</string>
+    <string name="bluetooth">蓝牙</string>
+    <string name="wifi">WIFI</string>
+    <string name="title_activity_bluetooth">BluetoothActivity</string>
+    <string name="startCollector">启动采集器</string>
+    <string name="stopCollector">停止采集器</string>
+    <string name="labelX">X:</string>
+    <string name="labelY">Y:</string>
+    <string name="labelZ">Z:</string>
+    <string name="labelCollector">数据采集器</string>
+    <string name="labelEnableBt">开启蓝牙</string>
+    <string name="labelEnableDiscovery">10秒开启蓝牙发现</string>
+    <string name="enableWifiAp">开启WIFI热点</string>
+    <string name="enableWifiP2pDiscovery">开启WifiP2p服务发现</string>
+    <string name="btClientTest">蓝牙客户端测试</string>
+    <string name="WifiClientTest">WIFI客户端测试</string>
+    <string name="wifiP2pDiscoveryTest">WifiP2p服务发现测试</string>
+</resources>
