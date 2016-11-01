@@ -3,6 +3,9 @@ package com.caodanping.androidcomm.wifi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 
 import com.caodanping.androidcomm.Constants;
 import com.caodanping.androidcomm.collector.Collector;
@@ -20,17 +23,20 @@ import java.net.Socket;
 public class NetConnectThread extends Thread {
     private Socket socket;
     private CollectorDataCallback callback;
+    private Handler handler;
 
-    public NetConnectThread(CollectorDataCallback callback) {
+    public NetConnectThread(CollectorDataCallback callback, Handler handler) {
         this.callback = callback;
+        this.handler = handler;
     }
 
     @Override
     public void run() {
         try {
-            socket = new Socket("192.168.0.1", 20000);
+            socket = new Socket("192.168.43.1", 20001);
+            handler.obtainMessage(Constants.MESSAGE_WIFI_CONNECTED).sendToTarget();
         } catch (IOException e) {
-            System.out.println("Error in create bluetooth socket.");
+            Log.e("NetConnectThread", "Error in create bluetooth socket.", e);
             return;
         }
 
@@ -39,7 +45,9 @@ public class NetConnectThread extends Thread {
 
     public void cancel() {
         try {
-            socket.close();
+            if (socket != null) {
+                socket.close();
+            }
         } catch (IOException e1) {
         }
     }

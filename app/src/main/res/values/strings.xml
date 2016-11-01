@@ -16,4 +16,5 @@
     <string name="btClientTest">蓝牙客户端测试</string>
     <string name="WifiClientTest">WIFI客户端测试</string>
     <string name="wifiP2pDiscoveryTest">WifiP2p服务发现测试</string>
+    <string name="connectToServer">连接到服务器</string>
 </resources>

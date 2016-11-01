@@ -2,6 +2,7 @@ package com.caodanping.androidcomm.wifi;
 
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
+import android.util.Log;
 
 import com.caodanping.androidcomm.Constants;
 import com.caodanping.androidcomm.collector.Collector;
@@ -54,12 +55,17 @@ public class NetConnectedThread extends Thread implements Collector.CollectorEve
             try {
                 // Read from the InputStream
                 len = in.read(buffer);
+                if (len == -1) {
+                    break;
+                }
                 // Send the obtained bytes to the UI activity
-                handler.obtainMessage(Constants.MESSAGE_READ, len, -1, buffer).sendToTarget();
+//                handler.obtainMessage(Constants.MESSAGE_READ, len, -1, buffer).sendToTarget();
             } catch (IOException e) {
                 break;
             }
         }
+
+        collector.removeCollectorEventListener(this);
     }
 
     public void write(byte[] bytes) {
@@ -69,7 +75,6 @@ public class NetConnectedThread extends Thread implements Collector.CollectorEve
     }
 
     public void cancel() {
-        collector.removeCollectorEventListener(this);
         try {
             socket.close();
         } catch (IOException e) { }
@@ -78,6 +83,7 @@ public class NetConnectedThread extends Thread implements Collector.CollectorEve
     @Override
     public void onDataCollected(Collector.CollectorData data) {
         String text = data.getX() + "," + data.getY() + "," + data.getZ() + "\n";
+        Log.i("NetConnectedThread", "Data writed:" + text);
         write(text.getBytes());
     }
 }

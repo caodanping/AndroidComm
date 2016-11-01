@@ -43,6 +43,21 @@ public class Collector implements Serializable {
         public float getZ() {
             return z;
         }
+
+        @Override
+        public String toString() {
+            return "CollectorData{" +
+                    "x=" + x +
+                    ", y=" + y +
+                    ", z=" + z +
+                    '}';
+        }
+
+        public String toDisplay() {
+            return    "X:" + x +
+                    ", Y:" + y +
+                    ", Z:" + z;
+        }
     }
 
     public static interface CollectorEventListener extends EventListener {

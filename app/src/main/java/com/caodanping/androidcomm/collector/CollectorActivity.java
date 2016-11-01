@@ -11,6 +11,7 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +24,7 @@ import com.caodanping.androidcomm.Constants;
 import com.caodanping.androidcomm.R;
 import com.caodanping.androidcomm.bluetooth.BtAcceptThread;
 import com.caodanping.androidcomm.wifi.DiscoveryManager;
+import com.caodanping.androidcomm.wifi.NetAcceptThread;
 import com.caodanping.androidcomm.wifi.WifiApManager;
 
 import java.util.HashMap;
@@ -56,11 +58,15 @@ public class CollectorActivity extends AppCompatActivity implements SensorEventL
     private WifiP2pManager wifiP2pManager;
     private WifiP2pManager.Channel channel;
     private DiscoveryManager discoveryManager;
+    private NetAcceptThread netAcceptThread;
+    private Handler hander;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_collector);
+
+        hander = new Handler(getMainLooper());
 
         btn =  (Button) findViewById(R.id.btnStartCollector);
         btnEnableBt = (Button) findViewById(R.id.btnEnableBt);
@@ -137,6 +143,9 @@ public class CollectorActivity extends AppCompatActivity implements SensorEventL
                 config.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
                 config.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
                 wifiApManager.setWifiApEnabled(config, true);
+
+                netAcceptThread = new NetAcceptThread(collector, hander);
+                netAcceptThread.start();
             }
         });
 
@@ -204,13 +213,27 @@ public class CollectorActivity extends AppCompatActivity implements SensorEventL
     }
 
     @Override
-    protected void onStop() {
+    protected void onDestroy() {
+
+        if (netAcceptThread != null) {
+            netAcceptThread.cancel();
+        }
+
+        if (btAcceptThread != null) {
+            btAcceptThread.cancel();
+        }
+
         wifiApManager.setWifiApEnabled(null, false);
-        super.onStop();
+
+        if (bluetoothAdapter.isDiscovering()) {
+            bluetoothAdapter.cancelDiscovery();
+        }
 
         if (bluetoothAdapter.isEnabled()) {
             bluetoothAdapter.disable();
         }
+
+        super.onDestroy();
     }
 
     @Override
@@ -220,6 +243,8 @@ public class CollectorActivity extends AppCompatActivity implements SensorEventL
             if (resultCode == RESULT_OK) {
                 // 蓝牙开启成功
                 Toast.makeText(this, "蓝牙开启成功", Toast.LENGTH_SHORT).show();
+                btAcceptThread = new BtAcceptThread(collector, bluetoothAdapter, hander);
+                btAcceptThread.start();
             }
         } else if (requestCode == REQUEST_ENABLE_BT_DISCOVERY) {
             if (resultCode > RESULT_CANCELED) {

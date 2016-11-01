@@ -12,4 +12,5 @@ public class Constants {
     public static final int MESSAGE_READ = 10000;
     public static final int MESSAGE_DATA_COLLECTED = 10001;
     public static final String DEVICE_NO = "sld3-0001";
+    public static final int MESSAGE_WIFI_CONNECTED = 10002;
 }

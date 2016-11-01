@@ -55,7 +55,7 @@ public class BtCollectorConnectedThread extends Thread implements Collector.Coll
                 // Read from the InputStream
                 len = in.read(buffer);
                 // Send the obtained bytes to the UI activity
-                handler.obtainMessage(Constants.MESSAGE_READ, len, -1, buffer).sendToTarget();
+//                handler.obtainMessage(Constants.MESSAGE_READ, len, -1, buffer).sendToTarget();
             } catch (IOException e) {
                 break;
             }

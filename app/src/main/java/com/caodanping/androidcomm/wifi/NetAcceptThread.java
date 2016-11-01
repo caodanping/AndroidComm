@@ -3,6 +3,7 @@ package com.caodanping.androidcomm.wifi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.os.Handler;
 
 import com.caodanping.androidcomm.Constants;
 import com.caodanping.androidcomm.collector.Collector;
@@ -16,11 +17,16 @@ import java.net.Socket;
  */
 
 public class NetAcceptThread extends Thread {
+    private Handler handler;
     private ServerSocket serverSocket;
     private Collector collector;
+    private int port;
+    private NetConnectedThread netConnectedThread;
 
-    public NetAcceptThread(Collector collector) {
+
+    public NetAcceptThread(Collector collector, Handler handler) {
         this.collector = collector;
+        this.handler = handler;
         try {
             this.serverSocket = new ServerSocket(20001);
         } catch (IOException e) {
@@ -30,9 +36,11 @@ public class NetAcceptThread extends Thread {
     @Override
     public void run() {
         try {
-            serverSocket = new ServerSocket(20001);
+            port = 20001;
+            serverSocket = new ServerSocket(port);
         } catch (IOException e) {
             System.out.println("listening error");
+            e.printStackTrace();
             return;
         }
 
@@ -46,9 +54,6 @@ public class NetAcceptThread extends Thread {
 
             if (socket != null) {
                 manageConnectedSocket(socket);
-                // 只接收一次连接
-                cancel();
-                break;
             }
         }
     }
@@ -64,6 +69,16 @@ public class NetAcceptThread extends Thread {
     }
 
     private void manageConnectedSocket(Socket socket) {
+        if (netConnectedThread != null) {
+            netConnectedThread.cancel();
+            netConnectedThread = null;
+        }
 
+        netConnectedThread = new NetConnectedThread(collector, socket, handler);
+        netConnectedThread.start();
+    }
+
+    public int getPort() {
+        return port;
     }
 }
